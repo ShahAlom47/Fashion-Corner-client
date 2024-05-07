@@ -4,6 +4,7 @@ import Cart from '../Cart/Cart';
 import Product from '../Product/Product';
 import './Shop.css';
 import { Link, useLoaderData } from 'react-router-dom';
+import useSecure from '../../CoustomHocks/useSecure';
 
 const Shop = () => {
     const [products, setProducts] = useState([]);
@@ -13,7 +14,8 @@ const Shop = () => {
     const [itemsPerPage ,setItemsPerPage ]=useState(10)
     const [currentPage ,setCurrentPage]=useState(0)
     const totalPage = Math.ceil(totalProducts/itemsPerPage)
-    console.log(totalPage);
+    const axiosSecure = useSecure()
+  
    
 
  // const pages =[];
@@ -28,10 +30,14 @@ const Shop = () => {
 
 
     useEffect(() => {
-        fetch('http://localhost:5000/products')
-            .then(res => res.json())
-            .then(data => setProducts(data))
-    }, []);
+
+        axiosSecure.get(`/products?page=${currentPage}&item=${itemsPerPage}`)
+        .then(data => setProducts(data.data))
+
+        // fetch(`http://localhost:5000/products?page=${currentPage}&item=${itemsPerPage}`)
+        //     .then(res => res.json())
+        //     .then(data => setProducts(data))
+    }, [currentPage,itemsPerPage]);
 
 
     useEffect(() => {
@@ -87,6 +93,7 @@ const Shop = () => {
 
     }
     const handelPrev=()=>{
+        currentPage> 0 &&  setCurrentPage(currentPage-1)
         
     }
     console.log(currentPage,totalPage);
@@ -105,8 +112,8 @@ const Shop = () => {
             </div>
             <div className=" flex  justify-center my-10">
             <button 
-                    onClick={handelNext} 
-                    className={` mx-2 bg-slate-400 `}
+                    onClick={handelPrev} 
+                    className={` mx-2 bg-slate-400 ${currentPage===0? 'hidden':''} `}
                 >
                {'< Prev'}</button>
             {
