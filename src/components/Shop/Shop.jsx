@@ -3,17 +3,36 @@ import { addToDb, deleteShoppingCart, getShoppingCart } from '../../utilities/fa
 import Cart from '../Cart/Cart';
 import Product from '../Product/Product';
 import './Shop.css';
-import { Link } from 'react-router-dom';
+import { Link, useLoaderData } from 'react-router-dom';
 
 const Shop = () => {
     const [products, setProducts] = useState([]);
     const [cart, setCart] = useState([])
+
+    const {totalProducts}= useLoaderData();
+    const [itemsPerPage ,setItemsPerPage ]=useState(10)
+    const [currentPage ,setCurrentPage]=useState(0)
+    const totalPage = Math.ceil(totalProducts/itemsPerPage)
+    console.log(totalPage);
+   
+
+ // const pages =[];
+    // for(let i=0; i<totalPage; i++){
+    //     pages.push(i)
+    // }
+
+    const pages = [...Array(totalPage).keys()];
+
+    console.log(currentPage);
+
+
 
     useEffect(() => {
         fetch('http://localhost:5000/products')
             .then(res => res.json())
             .then(data => setProducts(data))
     }, []);
+
 
     useEffect(() => {
         const storedCart = getShoppingCart();
@@ -61,9 +80,21 @@ const Shop = () => {
         deleteShoppingCart();
     }
 
+
+    const handelNext=()=>{
+       ( totalPage-1)>currentPage &&  setCurrentPage(currentPage+1)
+        // console.log(currentPage);
+
+    }
+    const handelPrev=()=>{
+        
+    }
+    console.log(currentPage,totalPage);
+
     return (
         <div className='shop-container'>
-            <div className="products-container">
+           <div >
+           <div className="products-container">
                 {
                     products.map(product => <Product
                         key={product._id}
@@ -72,6 +103,38 @@ const Shop = () => {
                     ></Product>)
                 }
             </div>
+            <div className=" flex  justify-center my-10">
+            <button 
+                    onClick={handelNext} 
+                    className={` mx-2 bg-slate-400 `}
+                >
+               {'< Prev'}</button>
+            {
+                pages?.map(page => <button 
+                    onClick={()=>setCurrentPage(page)} 
+                    className={` mx-2 bg-slate-400 ${currentPage===page?'bg-green-400':''}`}
+                >
+                    {page}</button>)
+            }
+            <button 
+                    onClick={ handelNext} 
+                    className={` mx-2 bg-slate-400 ${currentPage===(totalPage-1)? 'hidden':''} `}
+                    
+                >
+                {' Next >'} </button>
+
+            <select 
+            onChange={(e)=> {setItemsPerPage(e.target.value) ; setCurrentPage(0)}} 
+            value={itemsPerPage}
+            className='border-2 rounded-md p-3 font-medium '
+            >
+                <option value="5">Item 5</option>
+                <option value="10">Item 10</option>
+                <option value="20">Item 20</option>
+                <option value="30">Item 30</option>
+            </select>
+            </div>
+           </div>
             <div className="cart-container">
                 <Cart
                     cart={cart}
