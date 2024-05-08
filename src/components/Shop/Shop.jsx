@@ -4,7 +4,7 @@ import Cart from '../Cart/Cart';
 import Product from '../Product/Product';
 import './Shop.css';
 import { Link, useLoaderData } from 'react-router-dom';
-import useSecure from '../../CoustomHocks/useSecure';
+import useAxiosSecure from '../../CoustomHocks/useAxiosSecure';
 
 const Shop = () => {
     const [products, setProducts] = useState([]);
@@ -14,7 +14,7 @@ const Shop = () => {
     const [itemsPerPage ,setItemsPerPage ]=useState(10)
     const [currentPage ,setCurrentPage]=useState(0)
     const totalPage = Math.ceil(totalProducts/itemsPerPage)
-    const axiosSecure = useSecure()
+const axiosSecure= useAxiosSecure()
   
    
 
@@ -25,14 +25,16 @@ const Shop = () => {
 
     const pages = [...Array(totalPage).keys()];
 
-    console.log(currentPage);
+
 
 
 
     useEffect(() => {
 
+        // axiosSecure.get(`/products?page=${currentPage}&item=${itemsPerPage}`)
         axiosSecure.get(`/products?page=${currentPage}&item=${itemsPerPage}`)
         .then(data => setProducts(data.data))
+        .catch(err=>console.log('shop',err.response))
 
         // fetch(`http://localhost:5000/products?page=${currentPage}&item=${itemsPerPage}`)
         //     .then(res => res.json())
@@ -96,14 +98,14 @@ const Shop = () => {
         currentPage> 0 &&  setCurrentPage(currentPage-1)
         
     }
-    console.log(currentPage,totalPage);
+   
 
     return (
         <div className='shop-container'>
            <div >
            <div className="products-container">
                 {
-                    products.map(product => <Product
+                    products?.map(product => <Product
                         key={product._id}
                         product={product}
                         handleAddToCart={handleAddToCart}
@@ -118,6 +120,7 @@ const Shop = () => {
                {'< Prev'}</button>
             {
                 pages?.map(page => <button 
+                    key={page}
                     onClick={()=>setCurrentPage(page)} 
                     className={` mx-2 bg-slate-400 ${currentPage===page?'bg-green-400':''}`}
                 >

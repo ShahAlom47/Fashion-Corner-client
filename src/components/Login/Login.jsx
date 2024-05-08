@@ -6,7 +6,7 @@ const Login = () => {
     const { user, loginUser} = useAuth()
     const navigate = useNavigate()
     const location = useLocation();
-    console.log(location);
+   
    
 
 

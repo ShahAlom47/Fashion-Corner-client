@@ -8,6 +8,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, on
 // import axios from "axios"
 
 import auth from "../../firebase.config";
+import axios from "axios";
 
 
 export const AuthContext = createContext(null)
@@ -15,6 +16,7 @@ const AuthProvider = ({children}) => {
     // const auth = getAuth(app);
     const [loading ,setLoading]=useState(true)
     const [user,setUser]=useState(null)
+    // const axiosSecure=useSecure() 
 
     const createUser =(email,password)=>{
         setLoading(true)
@@ -28,12 +30,11 @@ const AuthProvider = ({children}) => {
     }
 
     const LogOutUser = () => {
-        
         return signOut(auth)
-        
-
     }
 
+
+    // ==================
     useEffect(() => {
 
         const unSubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -44,27 +45,27 @@ const AuthProvider = ({children}) => {
             setUser(currentUser);
             setLoading(false)
             
-            // if(currentUser){
-            //     axios.post('http://localhost:3000/jwt', userEmail,{withCredentials:true})
-            //       .then(function (response) {
-            //         console.log(response.data);
-            //       })
-            //       .catch(function (error) {
-            //         console.log(error);
-            //       });
+            if(currentUser){
+                axios.post('http://localhost:5000/jwt', userEmail,{withCredentials:true})
+                  .then(function (response) {
+                    console.log(response.data);
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
 
                
-            // }
-        //   else{
-        //     axios.post('http://localhost:3000/jwt/logout', logOutUser,{withCredentials:true})
-        //           .then(function (response) {
-        //             console.log(response.data);
-        //           })
-        //           .catch(function (error) {
-        //             console.log(error);
-        //           });
+            }
+          else{
+            axios.post('http://localhost:5000/jwt/logout', logOutUser,{withCredentials:true})
+                  .then(function (response) {
+                    console.log('logout ',response.data);
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
 
-        //   }
+          }
            
         });
 
@@ -72,8 +73,6 @@ const AuthProvider = ({children}) => {
     }, [user])
 
   
-
-    
 
 
 
@@ -93,7 +92,6 @@ const AuthProvider = ({children}) => {
     return (<>
     <AuthContext.Provider value={userInfo}>
         {children}
-
     </AuthContext.Provider>
     </>
        
